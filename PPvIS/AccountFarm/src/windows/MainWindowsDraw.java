@@ -31,16 +31,23 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableModel;
 
 import controller.TimeControll;
+import controller.TimerAction;
 import model.ButtonData;
+import model.DisplayPanel;
 import model.MyButton;
+import model.ScorePanel;
+import model.ScoreStore;
 
 public class MainWindowsDraw {
 
+	public ScoreStore currentValueScore = new ScoreStore(20);
+	public List<Integer> activity = new ArrayList<Integer>();
 	public MainWindowsDraw() {
 
 	}
@@ -51,49 +58,40 @@ public class MainWindowsDraw {
 		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		windowFrame.setLocationRelativeTo(null);
 		windowFrame.setLayout(new GridLayout(1, 2));
-	
-		GridBagConstraints c = new GridBagConstraints(); 
+
 		ButtonData buttonList = new ButtonData();
 		
-		JPanel playPanel = new JPanel();
-		playPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		GameWindows game = new GameWindows(buttonList,playPanel);
-		//MyButton b = new MyButton();
-		game.setSize(400, 400);
-		windowFrame.add(game);
 		JLabel levelText = new JLabel("Выберите уровень: ");
 		String[] boxString = {"Новичок"}; 
 		JComboBox box = new JComboBox(boxString);
-		JLabel timeText = new JLabel("Время: ");
-		JLabel time = new JLabel("00:00");
-		JLabel scoreText = new JLabel("Счет: ");
-		JLabel score = new JLabel("20");
+		
 		JButton runPlayButton = new JButton("Начать игру");
 		JButton stopPlayButton = new JButton("Стоп");
-		
-		
 		JPanel panel = new JPanel();
 		JPanel firstPanel = new JPanel();
-		JPanel secondPanel = new JPanel();
-	
+		ScorePanel secondPanel = new ScorePanel();
+		secondPanel.drawPanel();
 		
+		DisplayPanel playPanel = new DisplayPanel();
+		playPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+		
+		Timer timer=null;
+		timer = new Timer(1000, null);
+		timer.addActionListener(new TimerAction(buttonList,secondPanel, currentValueScore,timer));
+			
+		GameWindows game = new GameWindows(buttonList,playPanel,secondPanel, timer, currentValueScore,activity);
+		
+		game.setSize(400, 400);
+		windowFrame.add(game);
+			
 		panel.setLayout(new GridLayout(3, 1));
 		firstPanel.setLayout(new FlowLayout());
-		secondPanel.setLayout(new GridLayout(4, 1));
-		
-		
+				
 		firstPanel.add(levelText);
 		firstPanel.add(box);
 		firstPanel.add(runPlayButton);
 		firstPanel.add(stopPlayButton);
 		
-		secondPanel.add(timeText);
-		secondPanel.add(time);
-		secondPanel.add(scoreText);
-		secondPanel.add(score);
-		
-		
-	
 		panel.add(firstPanel);
 		panel.add(playPanel);
 		panel.add(secondPanel);
@@ -102,18 +100,12 @@ public class MainWindowsDraw {
 		stopPlayButton.setFont(new Font("Arial", Font.ITALIC, 15));
 		Font firstFont = new Font("Arial", Font.BOLD, 25);
 		Font secondFont = new Font("Arial", Font.ITALIC, 20);
-		timeText.setFont(secondFont);
-		scoreText.setFont(secondFont);
-		time.setFont(firstFont);
-		score.setFont(firstFont);
+		
 		levelText.setFont(secondFont);
 		box.setFont(new Font("Arial", Font.PLAIN, 15));
-		timeText.setHorizontalAlignment(0);;
-		scoreText.setHorizontalAlignment(0);
-		time.setHorizontalAlignment(0);
-		score.setHorizontalAlignment(0);
 		
-		runPlayButton.addActionListener(new TimeControll(score,time,buttonList));
+		
+		runPlayButton.addActionListener(new GameWindows(buttonList,playPanel,secondPanel, timer, currentValueScore, activity));
 		
 		windowFrame.add(panel);
 		windowFrame.setVisible(true);

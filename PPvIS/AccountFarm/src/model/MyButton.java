@@ -12,7 +12,7 @@ import controller.GeneratorRandomNumber;
 
 public class MyButton extends JButton{
 	public int type;
-	public CoordinateCell coordinate;
+	public int number;
 	public void setSize(int arg0, int arg1) {
 		// TODO Auto-generated method stub
 		super.setSize(50, 50);
@@ -24,7 +24,6 @@ public class MyButton extends JButton{
 	 
 	 public void setMyIcon(Icon icon) {
 		 setIcon(icon);
-		 addActionListener(new CellListener(type));
 	 }
 	 
 	 public void badCell(){

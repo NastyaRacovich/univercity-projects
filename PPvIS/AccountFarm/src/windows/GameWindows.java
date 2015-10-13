@@ -33,28 +33,43 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import controller.CellListener;
+import controller.TimeControll;
+import controller.TimerAction;
 import model.ButtonData;
 import model.CoordinateCell;
+import model.DisplayPanel;
 import model.MyButton;
+import model.ScorePanel;
+import model.ScoreStore;
 
-public class GameWindows extends JPanel {
+public class GameWindows extends JPanel implements ActionListener {
 
 	public ButtonData buttonList;
-	public JPanel playPanel;
+	public DisplayPanel playPanel;
+	public List <Integer> activity;
+	public ScorePanel secondPanel;
+	public Timer timer;
+	public ScoreStore currentValueScore;
 
-	public GameWindows(ButtonData buttonList, JPanel playPanel) {
+	public GameWindows(ButtonData buttonList, DisplayPanel playPanel, ScorePanel secondPanel, Timer timer,
+			ScoreStore currentValueScore, List<Integer> activity) {
 		this.buttonList = buttonList;
 		this.playPanel = playPanel;
+		this.secondPanel = secondPanel;
+		this.timer = timer;
+		this.currentValueScore = currentValueScore;
+		this.activity=activity;
 		setLayout(new GridLayout(8, 8));
 		setMaximumSize(new Dimension(400, 400));
 		Random rnd = new Random();
 		int x = 1 + rnd.nextInt(8);
 		int y = 1 + rnd.nextInt(8);
-
+		
 		for (int index = 1; index <= 64; index++) {
 			MyButton button = new MyButton();
 			button.setSize(50, 50);
@@ -64,74 +79,19 @@ public class GameWindows extends JPanel {
 				button.type = 0;
 			} else
 				button.type = button.setRandomStartIcon();
-
-			CoordinateCell sq = new CoordinateCell();
-			sq.setX(((index - 1) % 8) + 1);
-			sq.setY(((index - 1) / 8) + 1);
-
-			button.coordinate = sq;
+			button.number = index;
 			add(button);
-
-			button.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					System.out.println(button.type);
-
-					if (button.type == 2) {
-						playPanel.removeAll();
-						playPanel.repaint();
-
-						JPanel imgPanel = new JPanel();
-						MyButton button1 = new MyButton();
-						ImageIcon icon1 = new ImageIcon("1.jpg");
-						button1.setMyIcon(icon1);
-						MyButton button2 = new MyButton();
-						ImageIcon icon2 = new ImageIcon("2.jpg");
-						button2.setMyIcon(icon2);
-						MyButton button3 = new MyButton();
-						ImageIcon icon3 = new ImageIcon("3.jpg");
-						button3.setMyIcon(icon3);
-						MyButton button4 = new MyButton();
-						ImageIcon icon4 = new ImageIcon("4.jpg");
-						button4.setMyIcon(icon4);
-						MyButton button5 = new MyButton();
-						ImageIcon icon5 = new ImageIcon("5.jpg");
-						button5.setMyIcon(icon5);
-
-
-						playPanel.setLayout(new FlowLayout());
-
-						imgPanel.add(button1);
-						
-						imgPanel.add(button2);
-						imgPanel.add(button3);
-						imgPanel.add(button4);
-						
-
-						playPanel.add(imgPanel);
-						//playPanel.repaint();
-						playPanel.setBackground(new Color(255,218,185));
-					}
-					if (button.type == 1) {
-						playPanel.removeAll();
-						playPanel.repaint();
-						playPanel.setLayout(new BorderLayout());
-						JLabel varLabel = new JLabel(" -5 очков за разблокированную клетку");
-						varLabel.setFont(new Font("Arial", Font.ITALIC, 20));
-						
-						playPanel.add(varLabel, BorderLayout.CENTER);
-					
-					//	playPanel.repaint();
-						playPanel.setBackground(Color.RED);
-					}
-
-				}
-			});
-
+			button.addActionListener(new CellListener(currentValueScore,button,playPanel,activity));
+			
+			
 			buttonList.setNewMyButton(button);
 
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		timer.start();
 	}
 }
